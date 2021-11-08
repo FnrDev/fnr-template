@@ -1,2 +1,4 @@
 # fnr-template
-Basic commands handler &amp; slash maker template
+My template using for most of my projects.
+
+Feel free to fork this repo
