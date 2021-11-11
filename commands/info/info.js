@@ -5,7 +5,7 @@ module.exports = {
     name: "info",
     description: "Get info about bot",
     timeout: 5000,
-    usage: "/binfo",
+    usage: "/info",
     run: async(interaction, client) => {
         const loopGuilds = [];
         client.guilds.cache.forEach((guild, i) => {
