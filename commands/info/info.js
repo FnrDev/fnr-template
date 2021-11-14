@@ -6,6 +6,7 @@ module.exports = {
     description: "Get info about bot",
     timeout: 5000,
     usage: "/info",
+    category: "info",
     run: async(interaction, client) => {
         const loopGuilds = [];
         client.guilds.cache.forEach((guild, i) => {
