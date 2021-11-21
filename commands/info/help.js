@@ -14,8 +14,9 @@ module.exports = {
     usage: "/ping",
     category: "info",
     run: async(interaction, client) => {
-        const command = interaction.options.getString('command');
-        if (command) {
+        try {
+            const command = interaction.options.getString('command');
+            if (command) {
             const cmd = client.commands.get(command.toLowerCase());
             if (!cmd) {
                 return interaction.reply({ content: `I can\'t find \`${cmd}\` command`, ephemeral: true })
@@ -36,7 +37,6 @@ module.exports = {
             }
             return interaction.reply({ embeds: [embed] })
         }
-        // await interaction.deferReply();
         const row = new MessageActionRow()
         .addComponents(
             new MessageSelectMenu()
@@ -60,45 +60,66 @@ module.exports = {
             ])
         )
         interaction.reply({ content: "**👋 Select Category You Need Help For**", components: [row] });
-        const filter = i => i.customId === 'help_menu' && i.user.id === interaction.user.id;
-        const collector = interaction.channel.createMessageComponentCollector({ filter: filter, max: 1 });
+        const filter = i => i.customId === 'help_menu' || 'selected_command' && i.user.id === interaction.user.id;
+        const collector = interaction.channel.createMessageComponentCollector({ filter: filter, max: 2, componentType: "SELECT_MENU" });
         collector.on('collect', async i => {
             if (i.values.includes('general')) {
                 await i.deferUpdate();
-                let loopGeneralCommands = '';
-                client.commands.filter(r => r.category === 'general').forEach(cmd => {
-                    if (!cmd.description) return;
-                    loopGeneralCommands += `**\`/${cmd.name}\`** - ${cmd.description}\n`
-                });
-                const embed = new MessageEmbed()
-                .setTitle('General Commnads:')
-                .setDescription(loopGeneralCommands)
-                .setColor(interaction.guild.me.displayHexColor)
-                .setFooter(`Requested by ${interaction.user.tag}`, interaction.user.displayAvatarURL({ dynamic: true }))
+                const loopArray = [];
+                if (client.commands.filter(r => r.category === 'general').size === '25') {
+                    loopArray.slice(0, 25)
+                }
+                client.commands.filter(r => r.category === "general").forEach(cmd => {
+                    loopArray.push({
+                        label: cmd.name,
+                        value: cmd.name,
+                        description: cmd.description,
+                        emoji: "⚙"
+                    })
+                })
+                const commandRow = row.setComponents(
+                    new MessageSelectMenu()
+                    .setCustomId('general_cmd')
+                    .setPlaceholder('General Commands')
+                    .setMinValues(1)
+                    .setMaxValues(1)
+                    .addOptions(loopArray)
+                )
                 return i.editReply({
-                    embeds: [embed],
-                    content: null,
-                    components: []
-                });
+                    content: "**Select what command you need help for.**",
+                    components: [commandRow]
+                })
             }
             if (i.values.includes('info')) {
                 await i.deferUpdate();
-                let loopInfoCommands = '';
-                client.commands.filter(r => r.category === 'info').forEach(cmd => {
-                    if (!cmd.description) return;
-                    loopInfoCommands += `**\`/${cmd.name}\`** - ${cmd.description}\n`
-                });
-                const embed = new MessageEmbed()
-                .setTitle('Info Commnads:')
-                .setDescription(loopInfoCommands)
-                .setColor(interaction.guild.me.displayHexColor)
-                .setFooter(`Requested by ${interaction.user.tag}`, interaction.user.displayAvatarURL({ dynamic: true }))
+                const loopArray = [];
+                if (client.commands.filter(r => r.category === 'info').size === '25') {
+                    loopArray.slice(0, 25)
+                }
+                client.commands.filter(r => r.category === "info").forEach(cmd => {
+                    loopArray.push({
+                        label: cmd.name,
+                        value: cmd.name,
+                        description: cmd.description,
+                        emoji: "ℹ"
+                    })
+                })
+                const commandRow = row.setComponents(
+                    new MessageSelectMenu()
+                    .setCustomId('info_cmd')
+                    .setPlaceholder('Info Commands')
+                    .setMinValues(1)
+                    .setMaxValues(1)
+                    .addOptions(loopArray)
+                )
                 return i.editReply({
-                    embeds: [embed],
-                    content: null,
-                    components: []
-                });
+                    content: "**Select what command you need help for.**",
+                    components: [commandRow]
+                })
             }
         })
+    } catch (e) {
+        return false;
+    }
     }
 }

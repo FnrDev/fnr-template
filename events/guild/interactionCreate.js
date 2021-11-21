@@ -48,4 +48,36 @@ module.exports = async(client, interaction) => {
 			await interaction.reply({ content: ':x: There was an error while executing this command!', ephemeral: true });
 		}
 	}
+	try {
+		if (interaction.isSelectMenu()) {
+			if (interaction.customId === 'ticket_cmd' || interaction.customId === 'info_cmd' || interaction.customId === 'general_cmd') {
+				const selectedValues = interaction.values;
+				const findCommand = client.commands.find(r => r.name === selectedValues[0])
+				if (selectedValues.includes(findCommand.name)) {
+					const embed = new MessageEmbed()
+					.setColor(interaction.guild.me.displayHexColor)
+					.setFooter(`Requested by ${interaction.user.tag}`, interaction.user.displayAvatarURL({ dynamic: true }))
+					if (findCommand.name) {
+						embed.setTitle(`Command: ${findCommand.name}`)
+					}
+					if (findCommand.description) {
+						embed.setDescription(findCommand.description)
+					}
+					if (findCommand.usage) {
+						embed.addField("Usage:", findCommand.usage)
+					}
+					if (findCommand.timeout) {
+						embed.addField("Timeout:", humanizeDuration(findCommand.timeout, { round: true }))
+					}
+					interaction.reply({
+						embeds: [embed],
+						ephemeral: true
+					})
+				}
+			}
+		}
+	} catch (e) {
+		console.error(e)
+		return false;
+	}
 } 
