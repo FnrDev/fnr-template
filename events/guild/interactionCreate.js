@@ -18,7 +18,7 @@ module.exports = async(client, interaction) => {
 				}
 			}
 			if (command.permission) {
-				if (!interaction.member.permission.has(command.permission)) {
+				if (!interaction.member.permissions.has(command.permission)) {
 					const embed = new MessageEmbed()
 					.setTitle('Missing Permission')
 					.setDescription(`:x: You need \`${command.permission}\` to use this command`)
