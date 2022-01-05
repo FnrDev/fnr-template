@@ -9,4 +9,12 @@ require('dotenv').config();
   require(`./handlers/${handler}`)(client);
 });
 
+process.on('unhandledRejection', (err) => {
+  console.error(`Unhandled Rejection: ${err}`);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error(`Uncaught Exception: ${err}`);
+});
+
 client.login(process.env.TOKEN);
